@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interest Calculator</title>
+    <style>
+        /* General Page Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+
+        /* Center the form and result section */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Results Section */
+        #result {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;  /* Initially hidden */
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        #result h2 {
+            margin-top: 0;
+            color: #16a085;
+            text-align: center;
+        }
+
+        #result p {
+            font-size: 20px;
+            margin: 10px 0;
+            color: #333;
+            text-align: center;
+        }
+
+        #result span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .highlight {
+            color: #e74c3c;
+            font-size: 22px;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Interest Calculator</h1>
+
+    <div class="container">
+        <!-- Input Form -->
+        <form id="calcForm">
+            <label for="principal">Principal:</label>
+            <input type="number" id="principal" name="principal" required placeholder="Enter Principal Amount">
+
+            <label for="rate">Rate (in %):</label>
+            <input type="number" id="rate" name="rate" required placeholder="Enter Rate of Interest">
+
+            <label for="time">Time (in years):</label>
+            <input type="number" id="time" name="time" required placeholder="Enter Time (years)">
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        <div id="result">
+            <h2>Calculation Results</h2>
+            <p><strong>Simple Interest:</strong> <span id="simple-interest" class="highlight"></span></p>
+            <p><strong>Compound Interest:</strong> <span id="compound-interest" class="highlight"></span></p>
+        </div>
+    </div>
+
+    <!-- JavaScript to handle form submission and call the Flask API -->
+    <script>
+        document.getElementById('calcForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let principal = document.getElementById('principal').value;
+            let rate = document.getElementById('rate').value;
+            let time = document.getElementById('time').value;
+
+            fetch('http://127.0.0.1:5000/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    principal: principal,
+                    rate: rate,
+                    time: time
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display both Simple and Compound Interest
+                document.getElementById('simple-interest').innerText = data.simple_interest;
+                document.getElementById('compound-interest').innerText = data.compound_interest;
+
+                // Show result section with a fade-in animation
+                document.getElementById('result').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'An error occurred';
+                document.getElementById('result').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
